@@ -1,9 +1,9 @@
 const { EventEmitter } = require('events')
 
-const HypercoreProtocol = require('hypercore-protocol')
-const hypercore = require('hypercore')
-const hypercoreCrypto = require('hypercore-crypto')
-const datEncoding = require('dat-encoding')
+const HypercoreProtocol = require('ddatabase-protocol')
+const ddatabase = require('ddatabase')
+const hypercoreCrypto = require('ddatabase-crypto')
+const datEncoding = require('dwebx-encoding')
 
 const thunky = require('thunky')
 const LRU = require('lru')
@@ -13,12 +13,12 @@ const maybe = require('call-me-maybe')
 const raf = require('random-access-file')
 
 const MASTER_KEY_FILENAME = 'master_key'
-const NAMESPACE = 'corestore'
+const NAMESPACE = 'dwebstore'
 
 class NamespacedCorestore {
-  constructor (corestore, name) {
+  constructor (dwebstore, name) {
     this.name = name
-    this.store = corestore
+    this.store = dwebstore
     this._opened = new Set()
     this.ready = this.store.ready.bind(this.store)
   }
@@ -74,7 +74,7 @@ class NamespacedCorestore {
   }
 }
 
-class Corestore extends EventEmitter {
+class DWebstore extends EventEmitter {
   constructor (storage, opts = {}) {
     super()
 
@@ -256,7 +256,7 @@ class Corestore extends EventEmitter {
   }
 
   get (coreOpts = {}) {
-    if (!this._isReady) throw new Error('Corestore.ready must be called before get.')
+    if (!this._isReady) throw new Error('DWebstore.ready must be called before get.')
     const self = this
 
     const generatedKeys = this._generateKeys(coreOpts)
@@ -290,7 +290,7 @@ class Corestore extends EventEmitter {
       return cb(err)
     })
 
-    const core = hypercore(name => {
+    const core = ddatabase(name => {
       if (name === 'key') return keyStorage.key
       if (name === 'secret_key') return keyStorage.secretKey
       return createStorage(name)
@@ -442,4 +442,4 @@ function defaultStorage (dir) {
   }
 }
 
-module.exports = Corestore
+module.exports = DWebstore
