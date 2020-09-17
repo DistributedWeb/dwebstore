@@ -1,8 +1,8 @@
-const HypercoreProtocol = require('hypercore-protocol')
+const HypercoreProtocol = require('ddatabase-protocol')
 const Nanoresource = require('nanoresource/emitter')
-const hypercore = require('hypercore')
-const hypercoreCrypto = require('hypercore-crypto')
-const datEncoding = require('dat-encoding')
+const ddatabase = require('ddatabase')
+const hypercoreCrypto = require('ddatabase-crypto')
+const datEncoding = require('dwebx-encoding')
 const maybe = require('call-me-maybe')
 
 const RefPool = require('refpool')
@@ -11,7 +11,7 @@ const derivedStorage = require('derived-key-storage')
 const raf = require('random-access-file')
 
 const MASTER_KEY_FILENAME = 'master_key'
-const NAMESPACE = 'corestore'
+const NAMESPACE = 'dwebstore'
 const NAMESPACE_SEPERATOR = ':'
 
 class InnerCorestore extends Nanoresource {
@@ -178,7 +178,7 @@ class InnerCorestore extends Nanoresource {
   }
 
   get (coreOpts = {}) {
-    if (!this.opened) throw new Error('Corestore.ready must be called before get.')
+    if (!this.opened) throw new Error('DWebstore.ready must be called before get.')
     const self = this
 
     const generatedKeys = this._generateKeys(coreOpts)
@@ -213,7 +213,7 @@ class InnerCorestore extends Nanoresource {
     if (cacheOpts.data) cacheOpts.data = cacheOpts.data.namespace()
     if (cacheOpts.tree) cacheOpts.tree = cacheOpts.tree.namespace()
 
-    const core = hypercore(name => {
+    const core = ddatabase(name => {
       if (name === 'key') return keyStorage.key
       if (name === 'secret_key') return keyStorage.secretKey
       return createStorage(name)
@@ -302,7 +302,7 @@ class InnerCorestore extends Nanoresource {
   }
 }
 
-class Corestore extends Nanoresource {
+class DWebstore extends Nanoresource {
   constructor (storage, opts = {}) {
     super()
 
@@ -377,7 +377,7 @@ class Corestore extends Nanoresource {
     if (!name) name = hypercoreCrypto.randomBytes(32)
     if (Buffer.isBuffer(name)) name = name.toString('hex')
     name = this._isNamespaced ? this.name + NAMESPACE_SEPERATOR + name : name
-    return new Corestore(this.storage, {
+    return new DWebstore(this.storage, {
       inner: this.inner,
       parent: this,
       name
@@ -426,4 +426,4 @@ function defaultStorage (dir) {
   }
 }
 
-module.exports = Corestore
+module.exports = DWebstore
