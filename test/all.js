@@ -1,18 +1,18 @@
 const p = require('path')
 const ram = require('random-access-memory')
 const raf = require('random-access-file')
-const datEncoding = require('dat-encoding')
-const hypercoreCrypto = require('hypercore-crypto')
+const datEncoding = require('dwebx-encoding')
+const hypercoreCrypto = require('ddatabase-crypto')
 const test = require('tape')
 
-const Corestore = require('..')
+const DWebstore = require('..')
 const {
   runAll,
   validateCore,
   cleanup
 } = require('./helpers')
 
-test('ram-based corestore, different get options', async t => {
+test('ram-based dwebstore, different get options', async t => {
   const store1 = await create(ram)
   const core1 = store1.default()
   var core2, core3, core4, core5, core6
@@ -55,7 +55,7 @@ test('ram-based corestore, different get options', async t => {
   t.end()
 })
 
-test('ram-based corestore, simple replication', async t => {
+test('ram-based dwebstore, simple replication', async t => {
   const store1 = await create(ram)
   const store2 = await create(ram)
   const core1 = store1.default()
@@ -91,7 +91,7 @@ test('ram-based corestore, simple replication', async t => {
   t.end()
 })
 
-test('ram-based corestore, replicating with different default keys', async t => {
+test('ram-based dwebstore, replicating with different default keys', async t => {
   const store1 = await create(ram)
   const store2 = await create(ram)
   const core1 = store1.default()
@@ -123,7 +123,7 @@ test('ram-based corestore, replicating with different default keys', async t => 
   t.end()
 })
 
-test('ram-based corestore, sparse replication', async t => {
+test('ram-based dwebstore, sparse replication', async t => {
   const store1 = await create(ram, { sparse: true })
   const store2 = await create(ram, { sparse: true })
   const core1 = store1.default()
@@ -168,7 +168,7 @@ test('ram-based corestore, sparse replication', async t => {
   t.end()
 })
 
-test('ram-based corestore, sparse replication with different default keys', async t => {
+test('ram-based dwebstore, sparse replication with different default keys', async t => {
   const store1 = await create(ram, { sparse: true })
   const store2 = await create(ram, { sparse: true })
   const core1 = store1.default()
@@ -204,7 +204,7 @@ test('ram-based corestore, sparse replication with different default keys', asyn
   t.end()
 })
 
-test('raf-based corestore, simple replication', async t => {
+test('raf-based dwebstore, simple replication', async t => {
   const store1 = await create(path => raf(p.join('store1', path)))
   const store2 = await create(path => raf(p.join('store2', path)))
   const core1 = store1.default()
@@ -242,7 +242,7 @@ test('raf-based corestore, simple replication', async t => {
   t.end()
 })
 
-test('raf-based corestore, close and reopen', async t => {
+test('raf-based dwebstore, close and reopen', async t => {
   var store = await create('test-store')
   var firstCore = store.default()
   var reopenedCore = null
@@ -268,7 +268,7 @@ test('raf-based corestore, close and reopen', async t => {
   t.end()
 })
 
-test('raf-based corestore, close and reopen with keypair option', async t => {
+test('raf-based dwebstore, close and reopen with keypair option', async t => {
   var store = await create('test-store')
   const keyPair = hypercoreCrypto.keyPair()
   var firstCore = store.get({ keyPair })
@@ -449,7 +449,7 @@ test('can check if cores are loaded', async t => {
   t.end()
 })
 
-test('top-level corestore replicates all opened cores', async t => {
+test('top-level dwebstore replicates all opened cores', async t => {
   const store1 = await create(ram)
   const store2 = await create(ram)
 
@@ -462,7 +462,7 @@ test('top-level corestore replicates all opened cores', async t => {
     cb => core1.ready(cb),
     cb => core2.ready(cb),
     cb => {
-      // Only replicate the top-level corestore
+      // Only replicate the top-level dwebstore
       const stream = store1.replicate(true, { live: true })
       stream.pipe(store2.replicate(false, { live: true })).pipe(stream)
       return cb(null)
@@ -479,7 +479,7 @@ test('top-level corestore replicates all opened cores', async t => {
   t.end()
 })
 async function create (storage, opts) {
-  const store = new Corestore(storage, opts)
+  const store = new DWebstore(storage, opts)
   await store.ready()
   return store
 }
