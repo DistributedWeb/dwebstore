@@ -1,9 +1,9 @@
 # dwebstore
-[![Build Status](https://travis-ci.com/andrewosh/dwebstore.svg?token=WgJmQm3Kc6qzq1pzYrkx&branch=master)](https://travis-ci.com/andrewosh/dwebstore)
+[![Build Status](https://travis-ci.com/distributedweb/dwebstore.svg?branch=master)](https://travis-ci.com/distributedweb/dwebstore)
 
 This module is the canonical implementation of the "dwebstore" interface, which exposes a DDatabase factory and a set of associated functions for managing generated Hypercores.
 
-A dwebstore is designed to efficiently store and replicate multiple sets of interlinked Hypercores, such as those used by [DDrive](https://github.com/distributedweb/ddrive) and [mountable-dwebtrie](https://github.com/andrewosh/dwebtrie), removing the responsibility of managing custom storage/replication code from these higher-level modules.
+A dwebstore is designed to efficiently store and replicate multiple sets of interlinked Hypercores, such as those used by [DDrive](https://github.com/distributedweb/ddrive) and [mountable-dwebtrie](https://github.com/distributedweb/dwebtrie), removing the responsibility of managing custom storage/replication code from these higher-level modules.
 
 In order to do this, dwebstore provides:
 1. __Key derivation__ - all writable DDatabase keys are derived from a single master key.
