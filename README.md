@@ -1,14 +1,14 @@
 # dwebstore
 [![Build Status](https://travis-ci.com/distributedweb/dwebstore.svg?branch=master)](https://travis-ci.com/distributedweb/dwebstore)
 
-This module is the canonical implementation of the "dwebstore" interface, which exposes a DDatabase factory and a set of associated functions for managing generated Hypercores.
+This module is the canonical implementation of the "dwebstore" interface, which exposes a dDatabase factory and a set of associated functions for managing generated dDatabases.
 
-A dwebstore is designed to efficiently store and replicate multiple sets of interlinked Hypercores, such as those used by [DDrive](https://github.com/distributedweb/ddrive) and [mountable-dwebtrie](https://github.com/distributedweb/dwebtrie), removing the responsibility of managing custom storage/replication code from these higher-level modules.
+A dwebstore is designed to efficiently store and replicate multiple sets of interlinked Hypercores, such as those used by [DDrive](https://github.com/distributedweb/ddrive) and [mountable-dwebtrie](https://github.com/distributedweb/mountable-dwebtrie), removing the responsibility of managing custom storage/replication code from these higher-level modules.
 
 In order to do this, dwebstore provides:
-1. __Key derivation__ - all writable DDatabase keys are derived from a single master key.
+1. __Key derivation__ - all writable dDatabase keys are derived from a single master key.
 2. __Caching__ - Two separate caches are used for passively replicating cores (those requested by peers) and active cores (those requested by the owner of the dwebstore).
-3. __Storage bootstrapping__ - You can create a `default` DDatabase that will be loaded when a key is not specified, which is useful when you don't want to reload a previously-created DDatabase by key.
+3. __Storage bootstrapping__ - You can create a `default` dDatabase that will be loaded when a key is not specified, which is useful when you don't want to reload a previously-created dDatabase by key.
 4. __Namespacing__ - If you want to create multiple compound data structures backed by a single dwebstore, you can create namespaced corestores such that each data structure's `default` feed is separate.
 
 ### Installation
@@ -23,26 +23,26 @@ const store = new DWebstore(ram)
 await store.ready()
 ```
 
-Hypercores can be generated with both the `get` and `default` methods. If the first writable core is created with `default`, it will be used for storage bootstrapping. We can always reload this bootstrapping core off disk without your having to store its public key externally. Keys for other hypercores should either be stored externally, or referenced from within the default core:
+DDatabases can be generated with both the `get` and `default` methods. If the first writable core is created with `default`, it will be used for storage bootstrapping. We can always reload this bootstrapping core off disk without your having to store its public key externally. Keys for other ddatabases should either be stored externally, or referenced from within the default core:
 ```js
-const core1 = store1.default()
+const dwebstore1 = store1.default()
 ```
 _Note: You do not have to create a default feed before creating additional ones unless you'd like to bootstrap your dwebstore from disk the next time it's instantiated._
 
-Additional hypercores can be created by key, using the `get` method. In most scenarios, these additional keys can be extracted from the default (bootstrapping) core. If that's not the case, keys will have to be stored externally:
+Additional ddatabases can be created by key, using the `get` method. In most scenarios, these additional keys can be extracted from the default (bootstrapping) core. If that's not the case, keys will have to be stored externally:
 ```js
-const core2 = store1.get({ key: Buffer(...) })
+const dwebstore2 = store1.get({ key: Buffer(...) })
 ```
-All hypercores are indexed by their discovery keys, so that they can be dynamically injected into replication streams when requested.
+All dDatabases are indexed by their discovery keys, so that they can be dynamically injected into replication streams when requested.
 
-Two corestores can be replicated with the `replicate` function, which accepts ddatabase's `replicate` options:
+Two dWebStores can be replicated with the `replicate` function, which accepts ddatabase's `replicate` options:
 ```js
 const store1 = new DWebstore(ram)
 const store2 = new DWebstore(ram)
 await Promise.all([store1.ready(), store2.ready()]
 
-const core1 = store2.get()
-const core2 = store2.get({ key: core1.key })
+const dwebstore1 = store2.get()
+const dwebstore2 = store2.get({ key: dwebstore1.key })
 const stream = store1.replicate(true, { live: true })
 stream.pipe(store2.replicate(false, { live: true })).pipe(stream) // This will replicate all common cores.
 ```
@@ -51,7 +51,7 @@ stream.pipe(store2.replicate(false, { live: true })).pipe(stream) // This will r
 #### `const store = dwebstore(storage, [opts])`
 Create a new dwebstore instance. `storage` can be either a random-access-storage module, or a function that takes a path and returns a random-access-storage instance.
 
-Opts is an optional object which can contain any DDatabase constructor options, plus the following:
+Opts is an optional object which can contain any dDatabase constructor options, plus the following:
 ```js
 {
   cacheSize: 1000 // The size of the LRU cache for passively-replicating cores.
@@ -59,7 +59,7 @@ Opts is an optional object which can contain any DDatabase constructor options, 
 ```
 
 #### `store.default(opts)`
-Create a new default ddatabase, which is used for bootstrapping the creation of subsequent hypercores. Options match those in `get`.
+Create a new default ddatabase, which is used for bootstrapping the creation of subsequent dDatabases. Options match those in `get`.
 
 #### `store.get(opts)`
 Create a new ddatabase. Options can be one of the following:
@@ -106,14 +106,14 @@ Namespaces currently need to be saved separately outside of dwebstore (as a mapp
 ```js
 async function getDrive (opts = {}) {
   let namespace = opts.key ? await lookupNamespace(opts.key) : await createNamespace()
-  const namespacedCorestore = store.namespace(namespace)
-  const drive = new DDrive(namespacedCorestore)
+  const namespacedDWebstore = store.namespace(namespace)
+  const drive = new DDrive(namespacedDWebstore)
   await saveNamespace(drive.key, namespace)
 }
 ```
 
 #### `store.close(cb)`
-Close all hypercores previously generated by the dwebstore.
+Close all dDatabases previously generated by the dwebstore.
 
 ### License
 MIT
